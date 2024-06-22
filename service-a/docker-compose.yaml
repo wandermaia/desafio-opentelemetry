@@ -2,4 +2,4 @@ services:
   service-a:
     build: .
     ports:
-      - "8182:8182"
+      - "8181:8181"

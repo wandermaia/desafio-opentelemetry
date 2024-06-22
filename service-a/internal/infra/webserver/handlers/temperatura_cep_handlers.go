@@ -47,7 +47,7 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Realizando a coleta no service-b
-	url := "http://localhost:8282/" + cepParam.Cep
+	url := "http://service-b:8282/" + cepParam.Cep
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("Erro chamar a url %s: %s", url, err)

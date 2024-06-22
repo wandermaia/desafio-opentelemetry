@@ -1,0 +1,3 @@
+include:
+  - service-a/docker-compose.yaml
+  - service-b/docker-compose.yaml
