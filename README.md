@@ -115,6 +115,6 @@ Para remover todos os containers
 docker rm -f $(docker ps -a -q)
 
 
-docker-compose up --build
+docker-compose up --build -d
 
 ```

@@ -2,10 +2,6 @@
 # Testes Locais
 # Cep Válido. Recebe um post no formato { "cep": "29902555" } e deve retornar Código 200 e o Response Body
 # no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-GET http://localhost:8181/32450000
-
-###
-
 # exemplo  ./goexpert/9-APIs/test/user.http
 POST http://localhost:8181/cep
 Content-Type: application/json
@@ -14,17 +10,32 @@ Content-Type: application/json
   "cep": "29902555"
 }
 
-
+###
 # Cep Válido, mas com caracter especial e espaço (São Paulo) Deve retornar Código 200 e o Response Body
 # no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-GET http://localhost:8181/01021200
+POST http://localhost:8181/cep
+Content-Type: application/json
+
+{
+  "cep": "01021200"
+}
 
 ###
 # Cep INVÁLIDO (com formato incorreto). Deve retornar Código 422 
 # e a mensagem "invalid zipcode"
-GET http://localhost:8181/324500000
+POST http://localhost:8181/cep
+Content-Type: application/json
+
+{
+  "cep": "324500000"
+}
 
 ###
 # Cep com formato válido, mas não encontrado. Deve retornar Código 404 
 # e a mensagem "can not find zipcode"
-GET http://localhost:8181/00000000
+POST http://localhost:8181/cep
+Content-Type: application/json
+
+{
+  "cep": "00000000"
+}

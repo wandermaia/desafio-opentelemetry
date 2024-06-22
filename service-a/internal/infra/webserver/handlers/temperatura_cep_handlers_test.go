@@ -14,8 +14,8 @@ import (
 // no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
 func TestBuscaTemperaturaHandlerOk(t *testing.T) {
 	router := chi.NewRouter()
-	router.Get("/{cep}", BuscaTemperaturaHandler)
-	req, _ := http.NewRequest("GET", "/32450000", nil)
+	router.Post("/cep", BuscaTemperaturaHandler)
+	req, _ := http.NewRequest("POST", "/32450000", nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 

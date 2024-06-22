@@ -15,8 +15,8 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Get("/{cep}", handlers.BuscaTemperaturaHandler)
 
-	log.Println("Servidor iniciado na porta 8181!")
-	http.ListenAndServe(":8181", router)
+	log.Println("Servidor iniciado na porta 8282!")
+	http.ListenAndServe(":8282", router)
 }
 
 // go mod init github.com/wandermaia/desafio-opentelemetry

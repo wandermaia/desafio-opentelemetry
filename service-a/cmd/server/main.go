@@ -13,7 +13,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
-	router.Get("/{cep}", handlers.BuscaTemperaturaHandler)
+	router.Post("/cep", handlers.BuscaTemperaturaHandler)
 
 	log.Println("Servidor iniciado na porta 8181!")
 	http.ListenAndServe(":8181", router)

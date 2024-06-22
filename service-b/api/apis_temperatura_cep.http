@@ -2,20 +2,20 @@
 # Testes Locais
 # Cep Válido. Deve retornar Código 200 e o Response Body
 # no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-GET http://localhost:8181/32450000
+GET http://localhost:8282/32450000
 
 ###
 
 # Cep Válido, mas com caracter especial e espaço (São Paulo) Deve retornar Código 200 e o Response Body
 # no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-GET http://localhost:8181/01021200
+GET http://localhost:8282/01021200
 
 ###
 # Cep INVÁLIDO (com formato incorreto). Deve retornar Código 422 
 # e a mensagem "invalid zipcode"
-GET http://localhost:8181/324500000
+GET http://localhost:8282/324500000
 
 ###
 # Cep com formato válido, mas não encontrado. Deve retornar Código 404 
 # e a mensagem "can not find zipcode"
-GET http://localhost:8181/00000000
+GET http://localhost:8282/00000000
