@@ -27,10 +27,11 @@ type ViaCEP struct {
 }
 
 // Struct que será utilizada para formar a resposta com o valor das temperaturas
-type TemperaturaCidade struct {
-	TempC float64 `json:"temp_C"`
-	TempF float64 `json:"temp_F"`
-	TempK float64 `json:"temp_K"`
+type ClimaCidade struct {
+	Cidade string  `json:"city"`
+	TempC  float64 `json:"temp_C"`
+	TempF  float64 `json:"temp_F"`
+	TempK  float64 `json:"temp_K"`
 }
 
 type ResponseBody struct {
@@ -85,7 +86,7 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Coletando a temperatura da cidade
-	temperatura, err := ConsultaTemperaturaCidade(dadosCep.Localidade)
+	climaCidade, err := ConsultaTemperaturaCidade(dadosCep.Localidade)
 	if err != nil {
 		log.Printf("Erro ao consultar os parâmetros para a localidade %s: %s", dadosCep.Localidade, err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -96,12 +97,12 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(temperatura)
+	json.NewEncoder(w).Encode(climaCidade)
 
 }
 
 // Função que vai realizar a consulta dos dados de temperatura da cidade
-func ConsultaTemperaturaCidade(cidade string) (*TemperaturaCidade, error) {
+func ConsultaTemperaturaCidade(cidade string) (*ClimaCidade, error) {
 
 	// Variável temporária. O token será alterado
 	token := "6ceb0269ea6049eda52220700241706"
@@ -122,7 +123,7 @@ func ConsultaTemperaturaCidade(cidade string) (*TemperaturaCidade, error) {
 	}
 
 	// Realizando o Unmarshal
-	var temperatura TemperaturaCidade
+	var clima ClimaCidade
 	var data ResponseBody
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -131,12 +132,13 @@ func ConsultaTemperaturaCidade(cidade string) (*TemperaturaCidade, error) {
 	}
 
 	// Segregando os dados e calculando a temperatura em kelvin a partir da temperatura em Celsius
-	temperatura.TempC = data.Current.TempC
-	temperatura.TempF = data.Current.TempF
-	temperatura.TempK = data.Current.TempC + 273.0
+	clima.Cidade = cidade
+	clima.TempC = data.Current.TempC
+	clima.TempF = data.Current.TempF
+	clima.TempK = data.Current.TempC + 273.0
 
 	// Enviando a resposta
-	return &temperatura, nil
+	return &clima, nil
 
 }
 

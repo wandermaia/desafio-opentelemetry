@@ -11,7 +11,7 @@ import (
 )
 
 // Cep Válido. Deve retornar Código 200 e o Response Body
-// no formato: { "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
+// no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
 func TestBuscaTemperaturaHandlerOk(t *testing.T) {
 	router := chi.NewRouter()
 	router.Get("/{cep}", BuscaTemperaturaHandler)
@@ -19,17 +19,17 @@ func TestBuscaTemperaturaHandlerOk(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	var temperatura TemperaturaCidade
-	err := json.Unmarshal(w.Body.Bytes(), &temperatura)
+	var clima ClimaCidade
+	err := json.Unmarshal(w.Body.Bytes(), &clima)
 	if err != nil {
 		return
 	}
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.NotEmpty(t, temperatura)
+	assert.NotEmpty(t, clima)
 }
 
 // Cep Válido, mas com caracter especial e espaço (São Paulo) Deve retornar Código 200 e o Response Body
-// no formato: { "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
+// no formato: { "city: "São Paulo", "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
 func TestBuscaTemperaturaHandlerOkCaractereEspecial(t *testing.T) {
 	router := chi.NewRouter()
 	router.Get("/{cep}", BuscaTemperaturaHandler)
@@ -37,13 +37,13 @@ func TestBuscaTemperaturaHandlerOkCaractereEspecial(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	var temperatura TemperaturaCidade
-	err := json.Unmarshal(w.Body.Bytes(), &temperatura)
+	var clima ClimaCidade
+	err := json.Unmarshal(w.Body.Bytes(), &clima)
 	if err != nil {
 		return
 	}
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.NotEmpty(t, temperatura)
+	assert.NotEmpty(t, clima)
 }
 
 // Cep INVÁLIDO (com formato incorreto). Deve retornar Código 422
@@ -55,13 +55,13 @@ func TestBuscaTemperaturaHandlerCepInvalido(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	var temperatura TemperaturaCidade
-	err := json.Unmarshal(w.Body.Bytes(), &temperatura)
+	var clima ClimaCidade
+	err := json.Unmarshal(w.Body.Bytes(), &clima)
 	if err != nil {
 		return
 	}
 	assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
-	assert.Empty(t, temperatura)
+	assert.Empty(t, clima)
 }
 
 // Cep com formato válido, mas não encontrado. Deve retornar Código 404
@@ -73,11 +73,11 @@ func TestBuscaTemperaturaHandlerCepNaoEncontrado(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	var temperatura TemperaturaCidade
-	err := json.Unmarshal(w.Body.Bytes(), &temperatura)
+	var clima ClimaCidade
+	err := json.Unmarshal(w.Body.Bytes(), &clima)
 	if err != nil {
 		return
 	}
 	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.Empty(t, temperatura)
+	assert.Empty(t, clima)
 }

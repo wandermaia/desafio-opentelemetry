@@ -81,3 +81,40 @@ Após a implementação dos serviços, adicione a implementação do OTEL + Zipk
 
 - Utilize docker/docker-compose para que possamos realizar os testes de sua aplicação.
 
+
+## Execução do Desafio
+
+Foram criados dois módulos (um para cada serviço) utilizando os comandos abaixo:
+
+```bash
+
+go mod init github.com/wandermaia/desafio-temperatura-cep/service-a
+
+go mod init github.com/wandermaia/desafio-temperatura-cep/service-b
+
+```
+
+### Testes do Webserver
+
+Para a realização dos testes, basta executar o seguinte comando `go test ./internal/infra/webserver/handlers -v` a partir da raiz do repositório. Abaixo segue o exemplo da execução:
+
+
+```bash
+
+wander@bsnote283:~/desafio-temperatura-cep$ go test ./internal/infra/webserver/handlers -v
+wander@bsnote283:~/desafio-temperatura-cep$ 
+
+
+```
+
+
+Para remover todos os containers
+
+```bash
+
+docker rm -f $(docker ps -a -q)
+
+
+docker-compose up --build
+
+```

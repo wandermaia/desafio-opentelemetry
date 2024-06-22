@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/wandermaia/desafio-opentelemetry/service-b/internal/infra/webserver/handlers"
+	"github.com/wandermaia/desafio-temperatura-cep/service-b/internal/infra/webserver/handlers"
 )
 
 func main() {
@@ -15,8 +15,9 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Get("/{cep}", handlers.BuscaTemperaturaHandler)
 
-	log.Println("Servidor iniciado na porta 8080!")
-	http.ListenAndServe(":8080", router)
+	log.Println("Servidor iniciado na porta 8181!")
+	http.ListenAndServe(":8181", router)
 }
 
 // go mod init github.com/wandermaia/desafio-opentelemetry
+// docker rm -f $(docker ps -a -q)

@@ -1,4 +1,4 @@
-module github.com/wandermaia/desafio-opentelemetry
+module github.com/wandermaia/desafio-temperatura-cep/service-b
 
 go 1.22.1
 
