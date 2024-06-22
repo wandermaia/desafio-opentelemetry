@@ -1,5 +1,5 @@
 services:
-  service-b:
+  service-a:
     build: .
     ports:
-      - "8181:8181"
+      - "8182:8182"
