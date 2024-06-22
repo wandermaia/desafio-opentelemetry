@@ -1,6 +1,6 @@
 # Desafio OpenTelemetry - Sistema de Temperatura por CEP
 
-Este repositório foi criado exclusivamente para hospedar o código do desenvolvimento do Desfio de implementação do OpenTelemetry no Sistema de temperatura por CEP da da **Pós Go Expert**, ministrado pela **Full Cycle**.
+Este repositório foi criado exclusivamente para hospedar o código do desenvolvimento do Desfio de implementação do OpenTelemetry no Sistema de temperatura por CEP da **Pós Go Expert**, ministrado pela **Full Cycle**.
 
 ## Descrição do Desafio
 
