@@ -117,4 +117,9 @@ docker rm -f $(docker ps -a -q)
 
 docker-compose up --build -d
 
+
+for f in $(find . -name go.mod)
+    do (cd $(dirname $f); go mod tidy)
+done
+
 ```

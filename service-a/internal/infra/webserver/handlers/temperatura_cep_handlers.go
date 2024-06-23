@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/spf13/viper"
 )
 
 // Struct que será utilizada para formar a resposta com o valor das temperaturas
@@ -19,6 +21,22 @@ type ClimaCidade struct {
 // Struct que será utilizada para receber o cep do body da requisição
 type DadosCep struct {
 	Cep string `json:"cep"`
+}
+
+func init() {
+	//viper.AutomaticEnv()
+	// viper.SetDefault("TITLE", "Microservice Demo")
+	// viper.SetDefault("BACKGROUND_COLOR", "green")
+	// viper.SetDefault("RESPONSE_TIME", "1000")
+	// viper.SetDefault("EXTERNAL_CALL_URL", "http://goapp2:8181")
+	//http://service-b:8282/
+	viper.SetDefault("SERVICE_B_URL", "http://service-b:8282/")
+	// viper.SetDefault("EXTERNAL_CALL_METHOD", "GET")
+	// viper.SetDefault("REQUEST_NAME_OTEL", "microservice-demo")
+	// viper.SetDefault("OTEL_SERVICE_NAME", "microservice-demo")
+	// viper.SetDefault("OTEL_EXPORTER_OTLP_ENDPOINT", "otel-collector:4317")
+	//viper.SetDefault("HTTP_PORT", ":8181")
+	//ExternalCallURL:    viper.GetString("SERVICE_B_URL"),
 }
 
 // Função que busca a temperatura no service-b
@@ -47,7 +65,8 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Realizando a coleta no service-b
-	url := "http://service-b:8282/" + cepParam.Cep
+	//url := "http://service-b:8282/" + cepParam.Cep
+	url := viper.GetString("SERVICE_B_URL") + cepParam.Cep
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Printf("Erro chamar a url %s: %s", url, err)
