@@ -1,5 +1,0 @@
-services:
-  service-b:
-    build: .
-    ports:
-      - "8282:8282"

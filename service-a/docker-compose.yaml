@@ -1,5 +1,0 @@
-services:
-  service-a:
-    build: .
-    ports:
-      - "8181:8181"
