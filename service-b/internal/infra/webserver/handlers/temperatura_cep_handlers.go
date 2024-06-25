@@ -104,14 +104,14 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 // Função que vai realizar a consulta dos dados de temperatura da cidade
 func ConsultaTemperaturaCidade(cidade string) (*ClimaCidade, error) {
 
-	// Variável temporária. O token será alterado
-	token := "6ceb0269ea6049eda52220700241706"
+	// Constante para acesso
+	const CONSTANTE = "6ceb0269ea6049eda52220700241706"
 
 	// Realizando o encode para caracteres especiais e espaço
 	encodedCidade := url.QueryEscape(cidade)
 
 	// Coletando os daodos no webservice
-	url := "http://api.weatherapi.com/v1/current.json?q=" + encodedCidade + "&lang=pt&country=Brazil&key=" + token
+	url := "http://api.weatherapi.com/v1/current.json?q=" + encodedCidade + "&lang=pt&country=Brazil&key=" + CONSTANTE
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
