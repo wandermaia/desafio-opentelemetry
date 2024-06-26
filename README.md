@@ -140,7 +140,7 @@ wander@bsnote283:~/desafio-opentelemetry/service-b$
 
 ```
 
-Também foram criados os arquivos `service-a/api/apis_temperatura_service_a.http` e `service-a/api/apis_temperatura_service_b.http` para que os endpoints possam ser testados diretamente a partir do VScode. 
+Também foram criados os arquivos `service-a/api/apis_temperatura_service_a.http` e `service-a/api/apis_temperatura_service_b.http` para que os endpoints possam ser testados diretamente a partir do VScode (necessário instalar extensão REST Client). 
 
 Para a geração do trace distribuído, deve ser utilizado apenas o arquivo `service-a/api/apis_temperatura_service_a.http`, pois ele realiza a chamada do service-a, que internamente chama o service-b.
 
