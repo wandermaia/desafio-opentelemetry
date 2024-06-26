@@ -82,7 +82,7 @@ func (h *Webserver) BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
 
-	// Criação de um span
+	// Criação de span inicial
 	ctx, span := h.TemplateData.OTELTracer.Start(ctx, "Início Processamento "+h.TemplateData.RequestNameOTEL)
 	defer span.End()
 
@@ -115,19 +115,8 @@ func (h *Webserver) BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Reque
 
 	spanCEP.End()
 
-	// Realizando a coleta no service-b
-	//url := "http://service-b:8282/" + cepParam.Cep - ExternalCallURL
-	//url := viper.GetString("SERVICE_B_URL") + cepParam.Cep
-
-	// resp, err := http.Get(url)
-	// if err != nil {
-	// 	log.Printf("Erro chamar a url %s: %s", url, err)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	return
-	// }
-
 	// Criação de um span de trace do service-b
-	ctx, spanServiceB := h.TemplateData.OTELTracer.Start(ctx, "Consulta serivce-b")
+	ctx, spanServiceB := h.TemplateData.OTELTracer.Start(ctx, "Consulta service-b")
 
 	// Preparando a URL para a realização da request
 	url := h.TemplateData.ExternalCallURL + cepParam.Cep

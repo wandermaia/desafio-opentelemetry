@@ -2,12 +2,15 @@ receivers:
   otlp:
     protocols:
       grpc:
+      http:
 
 exporters:
   otlp:
     endpoint: jaeger-all-in-one:4317
     tls:
       insecure: true
+  zipkin:
+    endpoint: http://zipkin:9411/api/v2/spans 
  
   logging:
 
@@ -19,4 +22,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, logging]
+      exporters: [otlp, logging, zipkin]

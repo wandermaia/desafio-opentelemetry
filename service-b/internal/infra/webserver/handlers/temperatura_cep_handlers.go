@@ -8,9 +8,62 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
+
+// Struct que será utilizada para formar a resposta com o valor das temperaturas
+type ClimaCidade struct {
+	Cidade string  `json:"city"`
+	TempC  float64 `json:"temp_C"`
+	TempF  float64 `json:"temp_F"`
+	TempK  float64 `json:"temp_K"`
+}
+
+// Struct que será utilizada para receber o cep do path da requisição
+type DadosCep struct {
+	Cep string `json:"cep"`
+}
+
+// Struct para receber os dados para o webserver. A função BuscaTemperaturaHandler está anexada nessa struct. Com isso, ela terá acesso aos dados.
+type Webserver struct {
+	OtelData *TemplateOtelData
+}
+
+// Função que cria um novo webserver com base nos dados informados.
+func NewServer(templateOtelData *TemplateOtelData) *Webserver {
+	return &Webserver{
+		OtelData: templateOtelData,
+	}
+}
+
+// Cria um novo server utilizando o chi e acrescentando alguns midlewares importantes.
+func (we *Webserver) CreateServer() *chi.Mux {
+	router := chi.NewRouter()
+
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Timeout(60 * time.Second))
+	// promhttp. Usado para gerar as métricas automáticas do prometheus
+	router.Handle("/metrics", promhttp.Handler())
+	router.Get("/{cep}", we.BuscaTemperaturaHandler)
+	return router
+}
+
+// Struct para armazenamento dos dados do OTEL.
+type TemplateOtelData struct {
+	RequestNameOTEL string
+	OTELTracer      trace.Tracer
+}
 
 type ViaCEP struct {
 	Cep         string `json:"cep"`
@@ -24,14 +77,6 @@ type ViaCEP struct {
 	Ddd         string `json:"ddd"`
 	Siafi       string `json:"siafi"`
 	Erro        bool   `json:"erro"`
-}
-
-// Struct que será utilizada para formar a resposta com o valor das temperaturas
-type ClimaCidade struct {
-	Cidade string  `json:"city"`
-	TempC  float64 `json:"temp_C"`
-	TempF  float64 `json:"temp_F"`
-	TempK  float64 `json:"temp_K"`
 }
 
 type ResponseBody struct {
@@ -52,13 +97,27 @@ type ResponseBody struct {
 	} `json:"current"`
 }
 
-func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
+// Função que busca a temperatura
+func (h *Webserver) BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Carregandos o header para gerar o request id para conseguir a rastreabilidade
+	carrier := propagation.HeaderCarrier(r.Header)
+	ctx := r.Context()
+	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
+
+	// Criação de span inicial
+	ctx, span := h.OtelData.OTELTracer.Start(ctx, "Início Processamento "+h.OtelData.RequestNameOTEL)
+	defer span.End()
 
 	//Coletando o CEP  partir do parâmetro da URL
 	cepParam := chi.URLParam(r, "cep")
 
+	// Criação de um span de validação CEP
+	ctx, spanCEP := h.OtelData.OTELTracer.Start(ctx, "Validar Formatação CEP")
+
 	// Caso o cep não esteja em um formato válido, retora o código 422 e a mensagem de erro.
 	if !validarFormatoCEP(cepParam) {
+		spanCEP.SetStatus(codes.Error, "invalid zipcode")
 		log.Printf("invalid zipcode: %s", cepParam)
 		msg := struct {
 			Message string `json:"message"`
@@ -70,10 +129,13 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
+	spanCEP.End()
 
+	ctx, spanBuscaCepViaCep := h.OtelData.OTELTracer.Start(ctx, "Busca CEP")
 	// Buscando os dados da cidade
 	dadosCep, err := BuscaCepViaCep(cepParam)
 	if err != nil {
+		spanBuscaCepViaCep.SetStatus(codes.Error, "can not find zipcode")
 		log.Printf("can not find zipcode: %s", cepParam)
 		msg := struct {
 			Message string `json:"message"`
@@ -85,19 +147,28 @@ func BuscaTemperaturaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	spanBuscaCepViaCep.End()
+
+	ctx, spanConsultaTemperaturaCidade := h.OtelData.OTELTracer.Start(ctx, "Busca Temperatura")
+
 	// Coletando a temperatura da cidade
 	climaCidade, err := ConsultaTemperaturaCidade(dadosCep.Localidade)
 	if err != nil {
+		spanConsultaTemperaturaCidade.SetStatus(codes.Error, "Erro ao consultar os parâmetros para a localidade.")
 		log.Printf("Erro ao consultar os parâmetros para a localidade %s: %s", dadosCep.Localidade, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
+	spanConsultaTemperaturaCidade.End()
+
 	// Retornando a resposta
+	ctx, spanEnviandoResposta := h.OtelData.OTELTracer.Start(ctx, "Enviando resposta")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(climaCidade)
+	spanEnviandoResposta.End()
 
 }
 

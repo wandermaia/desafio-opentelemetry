@@ -1,20 +1,27 @@
 services:
-  jaeger-all-in-one:
-    image: jaegertracing/all-in-one:latest
-    restart: always
-    ports:
-      - "16686:16686"
-      - "14268"
-      - "14250"
+  # jaeger-all-in-one:
+  #   image: jaegertracing/all-in-one:latest
+  #   restart: always
+  #   ports:
+  #     - "16686:16686"
+  #     - "14268"
+  #     - "14250"
 
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:latest
+  zipkin-latest:
+    container_name: zipkin
+    image: openzipkin/zipkin
     restart: always
-    volumes:
-      - ./.docker/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "9411:9411"
+
+  # prometheus:
+  #   container_name: prometheus
+  #   image: prom/prometheus:latest
+  #   restart: always
+  #   volumes:
+  #     - ./.docker/prometheus.yaml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9090:9090"
 
   otel-collector:
     image: otel/opentelemetry-collector:latest
@@ -27,14 +34,14 @@ services:
       - "8889:8889"   # Prometheus exporter metrics
       - "4317:4317"   # OTLP gRPC receiver
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:latest
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - prometheus
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana:latest
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - prometheus
 
 
   service-a:
@@ -50,9 +57,10 @@ services:
     ports:
       - "8181:8181"
     depends_on:
-      - jaeger-all-in-one
-      - prometheus
+      # - jaeger-all-in-one
+      # - prometheus
       - otel-collector
+      - zipkin-latest
 
 
   service-b:
@@ -60,7 +68,6 @@ services:
     build:
       context: ./service-b
     environment:
-      - EXTERNAL_CALL_URL=http://goapp2:8181
       - REQUEST_NAME_OTEL=service-b-request
       - OTEL_SERVICE_NAME=service-b
       - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
@@ -68,7 +75,8 @@ services:
     ports:
       - "8282:8282"
     depends_on:
-      - jaeger-all-in-one
-      - prometheus
+      # - jaeger-all-in-one
+      # - prometheus
       - otel-collector
+      - zipkin-latest
 

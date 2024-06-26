@@ -49,11 +49,6 @@ func initProvider(serviceName, collectorURL string) (func(context.Context) error
 	defer cancel()
 
 	//Criando a chamada grpc
-	// https://stackoverflow.com/questions/78485578/how-to-use-the-bufconn-package-with-grpc-newclient verificar
-	// conn, err := grpc.DialContext(ctx, collectorURL,
-	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
-	// 	grpc.WithBlock(),
-	// )
 	conn, err := grpc.NewClient(collectorURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
